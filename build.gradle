@@ -11,6 +11,13 @@ buildscript {
 plugins {
     id 'java-library'
     id 'application'
+    id 'org.openjfx.javafxplugin' version '0.0.10'
+}
+
+
+javafx {
+    version = '17' // Specify javafx sdk version
+    modules = [ 'javafx.controls', 'javafx.fxml', 'javafx.swing', 'javafx.media', 'javafx.graphics']
 }
 
 group 'com.paipeng'
@@ -20,7 +27,6 @@ repositories {
     mavenCentral()
 }
 
-mainClassName = 'com.paipeng.javafxapp.AppApplication'
 
 
 javadoc {
@@ -44,8 +50,8 @@ dependencies {
 
 compileJava {
     options.fork = true
-    options.forkOptions.executable = "${System.properties['java.home']}/../bin/javac" // assumes that javac is on PATH
-    options.compilerArgs << "-XDignore.symbol.file"
+    //options.forkOptions.executable = "${System.properties['java.home']}/../bin/javac" // assumes that javac is on PATH
+    //options.compilerArgs << "-XDignore.symbol.file"
 }
 
 tasks.withType(JavaCompile) {
@@ -53,10 +59,11 @@ tasks.withType(JavaCompile) {
 }
 
 
-
+mainClassName = 'com.paipeng.javafxapp.AppApplication'
 project.configurations.implementation.setCanBeResolved(true)
 task fatJar(type: Jar) {
     println "my fatjar"
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
     manifest {
         attributes 'Main-Class' : mainClassName,
                 'Class-Path': configurations.implementation.collect {"$it.name"}.join(' ')
@@ -77,7 +84,8 @@ task fatJar(type: Jar) {
 
 def fatJarInputFile = 'build/libs/JavaFx-all-' + project.version.toString() + '.jar'
 def proguardOutputFile = 'out/obfuscated/JavaFx-all-' + project.version.toString() + '.jar'
-sourceCompatibility = 1.8
+sourceCompatibility = 11
+targetCompatibility = 11
 
 // for more details, see: http://proguard.sourceforge.net/manual/gradle.html
 task proguard(type: proguard.gradle.ProGuardTask, dependsOn: classes) {
